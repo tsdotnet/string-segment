@@ -5,8 +5,6 @@
   "author": "electricessence",
   "license": "MIT",
   "type": "module",
-  "main": "./dist/cjs/StringSegment.js",
-  "module": "./dist/esm/StringSegment.js",
   "exports": {
     ".": {
       "types": "./dist/types/StringSegment.d.ts",
@@ -84,10 +82,8 @@
       "semver@>=7.0.0 <7.5.2": ">=7.5.2",
       "get-func-name@<2.0.1": ">=2.0.1",
       "@babel/traverse@<7.23.2": ">=7.23.2",
-      "braces@<3.0.3": ">=3.0.3"
-    },
-    "ignoredBuiltDependencies": [
-      "esbuild"
-    ]
+      "braces@<3.0.3": ">=3.0.3",
+      "@isaacs/brace-expansion@<=5.0.0": ">=5.0.1"
+    }
   }
 }

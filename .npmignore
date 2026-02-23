@@ -14,3 +14,6 @@ typedoc.json
 tsconfig.*
 pnpm-lock.yaml
 package-lock.json
+eslint.config.*
+vitest.config.*
+rollup.config.*

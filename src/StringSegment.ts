@@ -83,9 +83,9 @@ export class StringSegment
 		const bufferLen = buffer?.length ?? 0;
 		offset = offset ?? 0;
 		if(buffer == null && offset !== 0) {
-				throw new ArgumentOutOfRangeException(
-					'offset', offset,
-					'Cannot specify a non-zero offset when buffer is null.');
+			throw new ArgumentOutOfRangeException(
+				'offset', offset,
+				'Cannot specify a non-zero offset when buffer is null.');
 		}
 
 		if(offset < 0 || offset > bufferLen)

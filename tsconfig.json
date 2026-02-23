@@ -12,8 +12,7 @@
     "esModuleInterop": true,
     "removeComments": true,
     "importHelpers": true,
-    "moduleResolution": "node",
-    "types": []
+    "moduleResolution": "node"
     // No outDir, module, declaration, etc.
   },
   "include": ["src/**/*"],
