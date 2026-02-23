@@ -1,6 +1,6 @@
 {
   "name": "@tsdotnet/string-segment",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "An optimized representation of a substring that avoids allocations, inspired by Microsoft.Extensions.Primitives.StringSegment.",
   "author": "electricessence",
   "license": "MIT",
