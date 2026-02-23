@@ -45,7 +45,7 @@ const EMPTY_STRING = '';
  * buffer. No new string is allocated until you access `.value` or call
  * `.toString()`.
  */
-export default class StringSegment
+class StringSegment
 {
 	/** A reusable empty segment (empty string, has a buffer). */
 	static readonly empty: StringSegment = new StringSegment(EMPTY_STRING, 0, 0);
@@ -772,6 +772,9 @@ export default class StringSegment
 		return new StringSegment(value);
 	}
 }
+
+export default StringSegment;
+export { StringSegment };
 
 // ---------------------------------------------------------------------------
 // Module-private helpers

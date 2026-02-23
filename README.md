@@ -22,7 +22,11 @@ pnpm add @tsdotnet/string-segment
 ## Quick Start
 
 ```ts
+// default import (also gives access to statics like StringSegment.from)
 import StringSegment, { split } from '@tsdotnet/string-segment';
+
+// named import — same class, both styles work
+import { StringSegment, split } from '@tsdotnet/string-segment';
 
 // Wrap a string — no allocation yet
 const seg = StringSegment.from('  hello, world  ');
