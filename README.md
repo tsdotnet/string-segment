@@ -25,7 +25,7 @@ pnpm add @tsdotnet/string-segment
 import StringSegment, { split } from '@tsdotnet/string-segment';
 
 // Wrap a string — no allocation yet
-const seg = new StringSegment('  hello, world  ');
+const seg = StringSegment.from('  hello, world  ');
 
 // Trim without allocating
 const trimmed = seg.trim();
@@ -93,24 +93,23 @@ is measurably faster and GC-friendlier.
 
 ## API
 
-### `new StringSegment(buffer: string)`
-### `new StringSegment(buffer: string, offset: number, length: number)`
-
-Create a segment wrapping an entire string, or a specific slice of one.
-
-```ts
-const whole  = new StringSegment('hello world');
-const slice  = new StringSegment('hello world', 6, 5); // "world"
-```
-
----
-
-### Static factories
+### Static factory
 
 #### `StringSegment.from(value: string | null | undefined): StringSegment`
 
-Convenience factory. Returns `StringSegment.noValue` for `null`/`undefined`,
+Wraps a string as a segment. Returns `StringSegment.noValue` for `null`/`undefined`,
 `StringSegment.empty` for `""`, otherwise wraps the string.
+
+#### `StringSegment.from(buffer: string, offset: number, length: number): StringSegment`
+
+Creates a segment over a specific slice of a string.
+
+```ts
+const whole = StringSegment.from('hello world');
+const slice = StringSegment.from('hello world', 6, 5); // "world"
+```
+
+The constructor is private — use `StringSegment.from(...)` to create instances.
 
 #### `StringSegment.empty`
 

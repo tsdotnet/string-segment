@@ -45,7 +45,7 @@ const EMPTY_STRING = '';
  * buffer. No new string is allocated until you access `.value` or call
  * `.toString()`.
  */
-export class StringSegment
+export default class StringSegment
 {
 	/** A reusable empty segment (empty string, has a buffer). */
 	static readonly empty: StringSegment = new StringSegment(EMPTY_STRING, 0, 0);
@@ -65,21 +65,12 @@ export class StringSegment
 	// Constructors
 	// -------------------------------------------------------------------
 
-	/**
-	 * Creates a `StringSegment` that wraps an entire string.
-	 * @param buffer The source string.
-	 */
-	constructor(buffer: string);
+	/** @internal */
+	private constructor(buffer: string);
+	/** @internal */
+	private constructor(buffer: string, offset: number, length: number);
 
-	/**
-	 * Creates a `StringSegment` over a slice of a string.
-	 * @param buffer The source string.
-	 * @param offset Zero-based start position within `buffer`.
-	 * @param length Number of characters in the segment.
-	 */
-	constructor(buffer: string, offset: number, length: number);
-
-	constructor(buffer: string, offset = 0, length?: number) {
+	private constructor(buffer: string, offset = 0, length?: number) {
 		const bufferLen = buffer?.length ?? 0;
 		offset = offset ?? 0;
 		if(buffer == null && offset !== 0) {
@@ -760,8 +751,22 @@ export class StringSegment
 	 * Wraps a string as a `StringSegment`.
 	 * Returns {@link StringSegment.noValue} for `null`/`undefined`,
 	 * {@link StringSegment.empty} for `""`.
+	 * @param value The source string (or null/undefined).
 	 */
-	static from(value: string | null | undefined): StringSegment {
+	static from(value: string | null | undefined): StringSegment;
+
+	/**
+	 * Creates a `StringSegment` over a slice of a string.
+	 * @param buffer The source string.
+	 * @param offset Zero-based start position within `buffer`.
+	 * @param length Number of characters in the segment.
+	 */
+	static from(buffer: string, offset: number, length: number): StringSegment;
+
+	static from(value: string | null | undefined, offset?: number, length?: number): StringSegment {
+		if(offset !== undefined) {
+			return new StringSegment(value as string, offset, length!);
+		}
 		if(value == null) return StringSegment.noValue;
 		if(value.length === 0) return StringSegment.empty;
 		return new StringSegment(value);
@@ -779,15 +784,13 @@ function buildCodeSet(chars: string): Set<number> {
 	return set;
 }
 
-export default StringSegment;
-
 // ---------------------------------------------------------------------------
 // Top-level convenience functions
 // ---------------------------------------------------------------------------
 
 /**
  * Lazily splits a plain string by a separator, yielding `StringSegment` slices.
- * Shorthand for `new StringSegment(buffer).split(separator, options)`.
+ * Shorthand for `StringSegment.from(buffer).split(separator, options)`.
  *
  * @example
  * import { split } from '@tsdotnet/string-segment';
@@ -800,12 +803,12 @@ export function split(
 	separator: string | StringSegment | number,
 	options?: SplitOptions
 ): Iterable<StringSegment> {
-	return new StringSegment(buffer).split(separator, options);
+	return StringSegment.from(buffer).split(separator, options);
 }
 
 /**
  * Splits a plain string by a separator and collects the parts into an array.
- * Shorthand for `new StringSegment(buffer).splitToArray(separator, options)`.
+ * Shorthand for `StringSegment.from(buffer).splitToArray(separator, options)`.
  *
  * @example
  * import { splitToArray } from '@tsdotnet/string-segment';
@@ -816,5 +819,5 @@ export function splitToArray(
 	separator: string | StringSegment | number,
 	options?: SplitOptions
 ): StringSegment[] {
-	return new StringSegment(buffer).splitToArray(separator, options);
+	return StringSegment.from(buffer).splitToArray(separator, options);
 }

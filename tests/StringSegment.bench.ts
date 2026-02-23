@@ -81,7 +81,7 @@ describe('Sparse CSV access (20 cols, read 2)', () => {
 	});
 
 	bench('segment — lazy split, materialize only cols 0 and 2', () => {
-		const seg = new StringSegment(CSV_ROW_20);
+		const seg = StringSegment.from(CSV_ROW_20);
 		let a = '', b = '', i = 0;
 		for(const part of seg.split(COMMA)) {
 			if(i === 0) a = part.trim().value;
@@ -105,7 +105,7 @@ describe('Sparse CSV access (100 cols, read 2)', () => {
 	});
 
 	bench('segment — lazy split, materialize only cols 0 and 4', () => {
-		const seg = new StringSegment(CSV_ROW_100);
+		const seg = StringSegment.from(CSV_ROW_100);
 		let a = '', b = '', i = 0;
 		for(const part of seg.split(COMMA)) {
 			if(i === 0) a = part.trim().value;
@@ -140,7 +140,7 @@ describe('HTTP header lookup (20 headers, find 1)', () => {
 	bench('segment — subsegment, trim, equals without materializing key', () => {
 		let found = '';
 		for(const line of HEADERS_LINES_20) {
-			const seg   = new StringSegment(line);
+			const seg   = StringSegment.from(line);
 			const colon = seg.indexOf(COLON_CODE);
 			if(colon === -1) continue;
 			const key   = seg.subsegment(0, colon).trim();
@@ -178,7 +178,7 @@ describe('HTTP header lookup (80 headers, find 1)', () => {
 	bench('segment — subsegment, trim, equals without materializing key', () => {
 		let found = '';
 		for(const line of HEADERS_LINES_80) {
-			const seg   = new StringSegment(line);
+			const seg   = StringSegment.from(line);
 			const colon = seg.indexOf(COLON_CODE);
 			if(colon === -1) continue;
 			const key   = seg.subsegment(0, colon).trim();
@@ -209,7 +209,7 @@ describe('Chained subsegment depth-4 (no allocation until .value)', () => {
 	});
 
 	bench('segment — 4x subsegment, one .value at the end', () => {
-		const s1 = new StringSegment(DEEP_STRING).subsegment(5);   // no alloc
+		const s1 = StringSegment.from(DEEP_STRING).subsegment(5);   // no alloc
 		const s2 = s1.subsegment(5);                               // no alloc
 		const s3 = s2.subsegment(5);                               // no alloc
 		const s4 = s3.subsegment(5, 6);                            // no alloc
@@ -239,7 +239,7 @@ describe('Trim + compare (high-frequency token check)', () => {
 	bench('segment — trim adjusts offsets, equals checks buffer directly', () => {
 		let found = false;
 		for(const t of PADDED_TOKENS) {
-			if(new StringSegment(t).trim().equals(TARGET)) { found = true; break; }
+			if(StringSegment.from(t).trim().equals(TARGET)) { found = true; break; }
 		}
 		if(!found) throw new Error('not found');
 	});

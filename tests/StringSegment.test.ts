@@ -3,9 +3,9 @@ import StringSegment, { type SplitOptions, split, splitToArray } from '../src/St
 
 const HELLO = 'Hello, World!';
 
-describe('StringSegment — constructor', () => {
+describe('StringSegment — from factory', () => {
 	it('wraps full string', () => {
-		const seg = new StringSegment(HELLO);
+		const seg = StringSegment.from(HELLO);
 		expect(seg.buffer).toBe(HELLO);
 		expect(seg.offset).toBe(0);
 		expect(seg.length).toBe(HELLO.length);
@@ -13,37 +13,37 @@ describe('StringSegment — constructor', () => {
 	});
 
 	it('wraps a slice', () => {
-		const seg = new StringSegment(HELLO, 7, 5);
+		const seg = StringSegment.from(HELLO, 7, 5);
 		expect(seg.offset).toBe(7);
 		expect(seg.length).toBe(5);
 		expect(seg.value).toBe('World');
 	});
 
 	it('throws on negative offset', () => {
-		expect(() => new StringSegment(HELLO, -1, 3)).toThrow(RangeError);
+		expect(() => StringSegment.from(HELLO, -1, 3)).toThrow(RangeError);
 	});
 
 	it('throws on offset beyond buffer', () => {
-		expect(() => new StringSegment(HELLO, 100, 0)).toThrow(RangeError);
+		expect(() => StringSegment.from(HELLO, 100, 0)).toThrow(RangeError);
 	});
 
 	it('throws on length overflow', () => {
-		expect(() => new StringSegment(HELLO, 7, 999)).toThrow(RangeError);
+		expect(() => StringSegment.from(HELLO, 7, 999)).toThrow(RangeError);
 	});
 });
 
 describe('StringSegment — properties', () => {
 	it('hasValue is true for every constructed segment', () => {
-		expect(new StringSegment('hello').hasValue).toBe(true);
+		expect(StringSegment.from('hello').hasValue).toBe(true);
 		expect(StringSegment.empty.hasValue).toBe(true);
 	});
 
 	it('isEmpty is false for non-empty', () => {
-		expect(new StringSegment('hello').isEmpty).toBe(false);
+		expect(StringSegment.from('hello').isEmpty).toBe(false);
 	});
 
 	it('isEmpty is true for empty', () => {
-		expect(new StringSegment('', 0, 0).isEmpty).toBe(true);
+		expect(StringSegment.from('', 0, 0).isEmpty).toBe(true);
 		expect(StringSegment.empty.isEmpty).toBe(true);
 	});
 
@@ -52,31 +52,31 @@ describe('StringSegment — properties', () => {
 	});
 
 	it('isWhitespace is true for all-space content', () => {
-		expect(new StringSegment('  \t\r\n  ').isWhitespace).toBe(true);
+		expect(StringSegment.from('  \t\r\n  ').isWhitespace).toBe(true);
 	});
 
 	it('isWhitespace is false when non-whitespace present', () => {
-		expect(new StringSegment('  a  ').isWhitespace).toBe(false);
+		expect(StringSegment.from('  a  ').isWhitespace).toBe(false);
 	});
 
 	it('isWhitespace respects segment bounds not full buffer', () => {
-		const seg = new StringSegment('hello   world', 5, 3); // '   '
+		const seg = StringSegment.from('hello   world', 5, 3); // '   '
 		expect(seg.isWhitespace).toBe(true);
 	});
 
 	it('value returns full buffer when covering whole string', () => {
 		const s = 'abc';
-		const seg = new StringSegment(s);
+		const seg = StringSegment.from(s);
 		expect(seg.value).toBe(s);
 	});
 
 	it('value returns slice', () => {
-		expect(new StringSegment(HELLO, 7, 5).value).toBe('World');
+		expect(StringSegment.from(HELLO, 7, 5).value).toBe('World');
 	});
 });
 
 describe('StringSegment — charAt / charCodeAt', () => {
-	const seg = new StringSegment('abcdef', 1, 4); // 'bcde'
+	const seg = StringSegment.from('abcdef', 1, 4); // 'bcde'
 
 	it('charAt returns correct characters', () => {
 		expect(seg.charAt(0)).toBe('b');
@@ -95,7 +95,7 @@ describe('StringSegment — charAt / charCodeAt', () => {
 });
 
 describe('StringSegment — indexOf', () => {
-	const seg = new StringSegment('a,b,,c,'); // 'a,b,,c,' — 7 chars
+	const seg = StringSegment.from('a,b,,c,'); // 'a,b,,c,' — 7 chars
 
 	it('finds first occurrence by char code', () => {
 		expect(seg.indexOf(',')).toBe(1);
@@ -122,19 +122,19 @@ describe('StringSegment — indexOf', () => {
 	});
 
 	it('works on an offset slice', () => {
-		const slice = new StringSegment('   hello   ', 3, 5); // 'hello'
+		const slice = StringSegment.from('   hello   ', 3, 5); // 'hello'
 		expect(slice.indexOf('l'.charCodeAt(0))).toBe(2);
 	});
 
 	it('multi-char string search', () => {
-		const s = new StringSegment('abcabc');
+		const s = StringSegment.from('abcabc');
 		expect(s.indexOf('bc')).toBe(1);
 		expect(s.indexOf('bc', 2)).toBe(4);
 	});
 
 	it('multi-char StringSegment search', () => {
-		const haystack = new StringSegment('--hello world--', 2, 11); // 'hello world'
-		const needle   = new StringSegment('___world___', 3, 5);       // 'world'
+		const haystack = StringSegment.from('--hello world--', 2, 11); // 'hello world'
+		const needle   = StringSegment.from('___world___', 3, 5);       // 'world'
 		expect(haystack.indexOf(needle)).toBe(6);
 	});
 
@@ -144,13 +144,13 @@ describe('StringSegment — indexOf', () => {
 	});
 
 	it('needle longer than segment returns -1', () => {
-		const short = new StringSegment('ab');
+		const short = StringSegment.from('ab');
 		expect(short.indexOf('abcde')).toBe(-1);
 	});
 });
 
 describe('StringSegment — indexOfAny', () => {
-	const seg = new StringSegment('a1b2c3');
+	const seg = StringSegment.from('a1b2c3');
 
 	it('finds first character matching any candidate', () => {
 		expect(seg.indexOfAny('123')).toBe(1);
@@ -169,7 +169,7 @@ describe('StringSegment — indexOfAny', () => {
 	});
 
 	it('works with whitespace candidate set', () => {
-		const line = new StringSegment('key:  value');
+		const line = StringSegment.from('key:  value');
 		expect(line.indexOfAny(' \t')).toBe(4);
 	});
 
@@ -178,13 +178,13 @@ describe('StringSegment — indexOfAny', () => {
 	});
 
 	it('works on an offset slice', () => {
-		const seg2 = new StringSegment('..abc..', 2, 3); // 'abc'
+		const seg2 = StringSegment.from('..abc..', 2, 3); // 'abc'
 		expect(seg2.indexOfAny('bc')).toBe(1);
 	});
 });
 
 describe('StringSegment — lastIndexOf', () => {
-	const seg = new StringSegment('a,b,,c,');
+	const seg = StringSegment.from('a,b,,c,');
 
 	it('finds last occurrence by char code', () => {
 		expect(seg.lastIndexOf(',')).toBe(6);
@@ -200,18 +200,18 @@ describe('StringSegment — lastIndexOf', () => {
 	});
 
 	it('works on an offset slice', () => {
-		const slice = new StringSegment('x,y,z', 2, 3); // 'y,z'
+		const slice = StringSegment.from('x,y,z', 2, 3); // 'y,z'
 		expect(slice.lastIndexOf(',')).toBe(1);
 	});
 
 	it('multi-char string search', () => {
-		const s = new StringSegment('abcabc');
+		const s = StringSegment.from('abcabc');
 		expect(s.lastIndexOf('abc')).toBe(3);
 	});
 
 	it('multi-char StringSegment search', () => {
-		const haystack = new StringSegment('one two one');
-		const needle   = new StringSegment('...one...', 3, 3); // 'one'
+		const haystack = StringSegment.from('one two one');
+		const needle   = StringSegment.from('...one...', 3, 3); // 'one'
 		expect(haystack.lastIndexOf(needle)).toBe(8);
 	});
 
@@ -221,7 +221,7 @@ describe('StringSegment — lastIndexOf', () => {
 });
 
 describe('StringSegment — substring', () => {
-	const seg = new StringSegment(HELLO, 7, 5); // 'World'
+	const seg = StringSegment.from(HELLO, 7, 5); // 'World'
 
 	it('extracts full sub-string', () => {
 		expect(seg.substring(0)).toBe('World');
@@ -238,7 +238,7 @@ describe('StringSegment — substring', () => {
 });
 
 describe('StringSegment — subsegment', () => {
-	const seg = new StringSegment(HELLO, 7, 5); // 'World'
+	const seg = StringSegment.from(HELLO, 7, 5); // 'World'
 
 	it('creates child segment sharing the same buffer', () => {
 		const child = seg.subsegment(1, 3);
@@ -271,7 +271,7 @@ describe('StringSegment — subsegment', () => {
 
 describe('StringSegment — preceding', () => {
 	const buffer = 'Hello, World!';
-	const seg = new StringSegment(buffer, 7, 5); // 'World'
+	const seg = StringSegment.from(buffer, 7, 5); // 'World'
 
 	it('returns all chars before the segment', () => {
 		const pre = seg.preceding();
@@ -285,7 +285,7 @@ describe('StringSegment — preceding', () => {
 	});
 
 	it('returns empty when at start of buffer', () => {
-		const atStart = new StringSegment(buffer, 0, 5);
+		const atStart = StringSegment.from(buffer, 0, 5);
 		expect(atStart.preceding()).toBe(StringSegment.empty);
 	});
 
@@ -296,19 +296,19 @@ describe('StringSegment — preceding', () => {
 
 describe('StringSegment — following', () => {
 	const buffer = 'Hello, World!';
-	const seg = new StringSegment(buffer, 7, 5); // 'World'
+	const seg = StringSegment.from(buffer, 7, 5); // 'World'
 
 	it('returns all chars after the segment', () => {
 		expect(seg.following().value).toBe('!');
 	});
 
 	it('limits by maxChars', () => {
-		const long = new StringSegment('one two three', 0, 3); // 'one'
+		const long = StringSegment.from('one two three', 0, 3); // 'one'
 		expect(long.following(4).value).toBe(' two');
 	});
 
 	it('returns empty when at end of buffer', () => {
-		const atEnd = new StringSegment(buffer, 8, 5); // 'orld!'
+		const atEnd = StringSegment.from(buffer, 8, 5); // 'orld!'
 		expect(atEnd.following()).toBe(StringSegment.empty);
 	});
 
@@ -318,7 +318,7 @@ describe('StringSegment — following', () => {
 });
 
 describe('StringSegment — startsWith', () => {
-	const seg = new StringSegment('Hello World');
+	const seg = StringSegment.from('Hello World');
 
 	it('true for matching prefix string', () => {
 		expect(seg.startsWith('Hello')).toBe(true);
@@ -342,13 +342,13 @@ describe('StringSegment — startsWith', () => {
 	});
 
 	it('accepts StringSegment as prefix', () => {
-		const prefix = new StringSegment('___Hello___', 3, 5); // 'Hello'
+		const prefix = StringSegment.from('___Hello___', 3, 5); // 'Hello'
 		expect(seg.startsWith(prefix)).toBe(true);
 	});
 });
 
 describe('StringSegment — endsWith', () => {
-	const seg = new StringSegment('Hello World');
+	const seg = StringSegment.from('Hello World');
 
 	it('true for matching suffix string', () => {
 		expect(seg.endsWith('World')).toBe(true);
@@ -371,13 +371,13 @@ describe('StringSegment — endsWith', () => {
 	});
 
 	it('accepts StringSegment as suffix', () => {
-		const suffix = new StringSegment('___World___', 3, 5); // 'World'
+		const suffix = StringSegment.from('___World___', 3, 5); // 'World'
 		expect(seg.endsWith(suffix)).toBe(true);
 	});
 });
 
 describe('StringSegment — equals', () => {
-	const seg = new StringSegment('Hello');
+	const seg = StringSegment.from('Hello');
 
 	it('equals a matching string', () => {
 		expect(seg.equals('Hello')).toBe(true);
@@ -393,7 +393,7 @@ describe('StringSegment — equals', () => {
 	});
 
 	it('equals another StringSegment', () => {
-		const other = new StringSegment('---Hello---', 3, 5);
+		const other = StringSegment.from('---Hello---', 3, 5);
 		expect(seg.equals(other)).toBe(true);
 	});
 
@@ -408,7 +408,7 @@ describe('StringSegment — equals', () => {
 
 describe('StringSegment — trim', () => {
 	const raw = '  \t Hello \n ';
-	const seg = new StringSegment(raw);
+	const seg = StringSegment.from(raw);
 
 	it('trimStart removes leading whitespace', () => {
 		expect(seg.trimStart().value).toBe('Hello \n ');
@@ -423,17 +423,17 @@ describe('StringSegment — trim', () => {
 	});
 
 	it('trim returns same instance when already trimmed', () => {
-		const clean = new StringSegment('abc');
+		const clean = StringSegment.from('abc');
 		expect(clean.trim()).toBe(clean);
 	});
 
 	it('trimStart returns same instance when already trimmed', () => {
-		const clean = new StringSegment('abc');
+		const clean = StringSegment.from('abc');
 		expect(clean.trimStart()).toBe(clean);
 	});
 
 	it('trimEnd returns same instance when already trimmed', () => {
-		const clean = new StringSegment('abc');
+		const clean = StringSegment.from('abc');
 		expect(clean.trimEnd()).toBe(clean);
 	});
 
@@ -444,39 +444,39 @@ describe('StringSegment — trim', () => {
 
 describe('StringSegment — trim with custom chars', () => {
 	it('trimStart strips custom chars', () => {
-		const seg = new StringSegment('...hello...');
+		const seg = StringSegment.from('...hello...');
 		expect(seg.trimStart('.').value).toBe('hello...');
 	});
 
 	it('trimEnd strips custom chars', () => {
-		const seg = new StringSegment('...hello...');
+		const seg = StringSegment.from('...hello...');
 		expect(seg.trimEnd('.').value).toBe('...hello');
 	});
 
 	it('trim strips custom chars from both sides', () => {
-		const seg = new StringSegment('***hello***');
+		const seg = StringSegment.from('***hello***');
 		expect(seg.trim('*').value).toBe('hello');
 	});
 
 	it('trim with multi-char candidate set', () => {
-		const seg = new StringSegment('< hello >');
+		const seg = StringSegment.from('< hello >');
 		expect(seg.trim('< >').value).toBe('hello');
 	});
 
 	it('trim custom does not strip whitespace unless specified', () => {
-		const seg = new StringSegment('  hello  ');
+		const seg = StringSegment.from('  hello  ');
 		expect(seg.trim('.').value).toBe('  hello  ');
 	});
 
 	it('returns same instance when no matching chars at edges', () => {
-		const seg = new StringSegment('hello');
+		const seg = StringSegment.from('hello');
 		expect(seg.trim('.')).toBe(seg);
 	});
 });
 
 describe('StringSegment — split', () => {
 	it("splits on ',' char code", () => {
-		const seg   = new StringSegment('a,b,c');
+		const seg   = StringSegment.from('a,b,c');
 		const parts = [...seg.split(',')];
 		expect(parts.length).toBe(3);
 		expect(parts[0]!.value).toBe('a');
@@ -485,18 +485,18 @@ describe('StringSegment — split', () => {
 	});
 
 	it("splits on ',' string", () => {
-		const parts = [...new StringSegment('a,b,c').split(',')];
+		const parts = [...StringSegment.from('a,b,c').split(',')];
 		expect(parts.length).toBe(3);
 	});
 
 	it('all parts share the same buffer', () => {
 		const buf  = 'x:y:z';
-		const parts = [...new StringSegment(buf).split(':')];
+		const parts = [...StringSegment.from(buf).split(':')];
 		for(const p of parts) expect(p.buffer).toBe(buf);
 	});
 
 	it('handles leading separator (empty first part)', () => {
-		const parts = [...new StringSegment(',a,').split(',')];
+		const parts = [...StringSegment.from(',a,').split(',')];
 		expect(parts.length).toBe(3);
 		expect(parts[0]!.value).toBe('');
 		expect(parts[1]!.value).toBe('a');
@@ -504,7 +504,7 @@ describe('StringSegment — split', () => {
 	});
 
 	it('no separator → yields the whole segment', () => {
-		const parts = [...new StringSegment('abc').split(',')];
+		const parts = [...StringSegment.from('abc').split(',')];
 		expect(parts.length).toBe(1);
 		expect(parts[0]!.value).toBe('abc');
 	});
@@ -516,7 +516,7 @@ describe('StringSegment — split', () => {
 	});
 
 	it('multi-char string separator', () => {
-		const parts = [...new StringSegment('one::two::three').split('::')];
+		const parts = [...StringSegment.from('one::two::three').split('::')];
 		expect(parts.length).toBe(3);
 		expect(parts[0]!.value).toBe('one');
 		expect(parts[1]!.value).toBe('two');
@@ -525,22 +525,22 @@ describe('StringSegment — split', () => {
 
 	it('multi-char: partial first-char match does not confuse the search', () => {
 		// ':x' has ':' appearing solo before the real '::' separator
-		const parts = [...new StringSegment('a:b::c').split('::')];
+		const parts = [...StringSegment.from('a:b::c').split('::')];
 		expect(parts.length).toBe(2);
 		expect(parts[0]!.value).toBe('a:b');
 		expect(parts[1]!.value).toBe('c');
 	});
 
 	it('StringSegment separator', () => {
-		const haystack = new StringSegment('a--b--c');
-		const sep      = new StringSegment('___--___', 3, 2); // '--'
+		const haystack = StringSegment.from('a--b--c');
+		const sep      = StringSegment.from('___--___', 3, 2); // '--'
 		const parts    = [...haystack.split(sep)];
 		expect(parts.length).toBe(3);
 		expect(parts[0]!.value).toBe('a');
 	});
 
 	it('is a lazy iterable — can break early', () => {
-		const seg   = new StringSegment('a,b,c,d,e');
+		const seg   = StringSegment.from('a,b,c,d,e');
 		let   count = 0;
 		for(const part of seg.split(',')) {
 			count++;
@@ -552,7 +552,7 @@ describe('StringSegment — split', () => {
 
 describe('StringSegment — splitToArray', () => {
 	it('returns an array of parts', () => {
-		const parts = new StringSegment('a,b,c').splitToArray(',');
+		const parts = StringSegment.from('a,b,c').splitToArray(',');
 		expect(Array.isArray(parts)).toBe(true);
 		expect(parts.length).toBe(3);
 		expect(parts[0]!.value).toBe('a');
@@ -560,14 +560,14 @@ describe('StringSegment — splitToArray', () => {
 	});
 
 	it('supports options', () => {
-		const parts = new StringSegment(' a , , b ').splitToArray(',', { trimEntries: true, removeEmpty: true });
+		const parts = StringSegment.from(' a , , b ').splitToArray(',', { trimEntries: true, removeEmpty: true });
 		expect(parts.length).toBe(2);
 		expect(parts[0]!.value).toBe('a');
 		expect(parts[1]!.value).toBe('b');
 	});
 
 	it('produces the same result as spreading split()', () => {
-		const seg    = new StringSegment('x:y:z');
+		const seg    = StringSegment.from('x:y:z');
 		const lazy   = [...seg.split(':')];
 		const eager  = seg.splitToArray(':');
 		expect(eager.length).toBe(lazy.length);
@@ -578,7 +578,7 @@ describe('StringSegment — splitToArray', () => {
 
 describe('StringSegment — split with options', () => {
 	it('trimEntries trims whitespace from each part', () => {
-		const seg   = new StringSegment(' a , b , c ');
+		const seg   = StringSegment.from(' a , b , c ');
 		const parts = [...seg.split(',', { trimEntries: true })];
 		expect(parts.length).toBe(3);
 		expect(parts[0]!.value).toBe('a');
@@ -587,14 +587,14 @@ describe('StringSegment — split with options', () => {
 	});
 
 	it('removeEmpty skips blank entries', () => {
-		const parts = [...new StringSegment('a,,b,,c').split(',', { removeEmpty: true })];
+		const parts = [...StringSegment.from('a,,b,,c').split(',', { removeEmpty: true })];
 		expect(parts.length).toBe(3);
 		expect(parts.every(p => !p.isEmpty)).toBe(true);
 	});
 
 	it('trimEntries + removeEmpty skips whitespace-only entries', () => {
 		const opts: SplitOptions = { trimEntries: true, removeEmpty: true };
-		const parts = [...new StringSegment('a, ,b,  ,c').split(',', opts)];
+		const parts = [...StringSegment.from('a, ,b,  ,c').split(',', opts)];
 		expect(parts.length).toBe(3);
 		expect(parts[0]!.value).toBe('a');
 		expect(parts[1]!.value).toBe('b');
@@ -616,11 +616,11 @@ describe('StringSegment — isNullOrEmpty / isNullOrWhiteSpace (static)', () => 
 	});
 
 	it('isNullOrEmpty: non-empty segment', () => {
-		expect(StringSegment.isNullOrEmpty(new StringSegment('hi'))).toBe(false);
+		expect(StringSegment.isNullOrEmpty(StringSegment.from('hi'))).toBe(false);
 	});
 
 	it('isNullOrEmpty: whitespace segment is NOT empty', () => {
-		expect(StringSegment.isNullOrEmpty(new StringSegment('  '))).toBe(false);
+		expect(StringSegment.isNullOrEmpty(StringSegment.from('  '))).toBe(false);
 	});
 
 	it('isNullOrWhiteSpace: null', () => {
@@ -636,11 +636,11 @@ describe('StringSegment — isNullOrEmpty / isNullOrWhiteSpace (static)', () => 
 	});
 
 	it('isNullOrWhiteSpace: all whitespace', () => {
-		expect(StringSegment.isNullOrWhiteSpace(new StringSegment('  \t  '))).toBe(true);
+		expect(StringSegment.isNullOrWhiteSpace(StringSegment.from('  \t  '))).toBe(true);
 	});
 
 	it('isNullOrWhiteSpace: has non-whitespace', () => {
-		expect(StringSegment.isNullOrWhiteSpace(new StringSegment('  a  '))).toBe(false);
+		expect(StringSegment.isNullOrWhiteSpace(StringSegment.from('  a  '))).toBe(false);
 	});
 });
 
@@ -669,15 +669,15 @@ describe('StringSegment — compare (static)', () => {
 	});
 
 	it('compares StringSegment instances', () => {
-		const a = new StringSegment('--hello--', 2, 5);
-		const b = new StringSegment('hello');
+		const a = StringSegment.from('--hello--', 2, 5);
+		const b = StringSegment.from('hello');
 		expect(StringSegment.compare(a, b)).toBe(0);
 	});
 });
 
 describe('StringSegment — iteration', () => {
 	it('iterates segment characters only (not full buffer)', () => {
-		const seg = new StringSegment('>>>abc<<<', 3, 3); // 'abc'
+		const seg = StringSegment.from('>>>abc<<<', 3, 3); // 'abc'
 		expect([...seg]).toEqual(['a', 'b', 'c']);
 	});
 
@@ -686,7 +686,7 @@ describe('StringSegment — iteration', () => {
 	});
 
 	it('spread produces same string as .value', () => {
-		const seg = new StringSegment(HELLO, 7, 5); // 'World'
+		const seg = StringSegment.from(HELLO, 7, 5); // 'World'
 		expect([...seg].join('')).toBe(seg.value);
 	});
 });
@@ -770,12 +770,12 @@ describe('splitToArray (exported function)', () => {
 
 describe('StringSegment — toString', () => {
 	it('returns the represented substring', () => {
-		const seg = new StringSegment('--hello--', 2, 5);
+		const seg = StringSegment.from('--hello--', 2, 5);
 		expect(seg.toString()).toBe('hello');
 	});
 
 	it('same as .value', () => {
-		const seg = new StringSegment(HELLO, 7, 5);
+		const seg = StringSegment.from(HELLO, 7, 5);
 		expect(seg.toString()).toBe(seg.value);
 	});
 });
