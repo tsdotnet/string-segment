@@ -68,7 +68,7 @@ and proportionally less pressure on the garbage collector.
 Benchmarks run with [Vitest bench](https://vitest.dev/guide/performance) on Node.js (V8):
 
 | Scenario | Native | StringSegment | Winner |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Sparse CSV – 100 cols, read 2 | 651,292 hz | 1,919,318 hz | **Segment ~3×** ✅ |
 | Sparse CSV – 20 cols, read 2 | 2,650,702 hz | 2,667,912 hz | Tied (~1×) |
 | HTTP header lookup – 20 headers | 8,986,460 hz | 1,997,432 hz | Native ~4.5× |
@@ -129,7 +129,7 @@ throws `NullReferenceException` unless guarded by `hasValue`.
 ### Core properties
 
 | Property | Type | Description |
-|---|---|---|
+| --- | --- | --- |
 | `buffer` | `string \| null` | The source string. `null` only for `noValue`. |
 | `offset` | `number` | Zero-based start position within `buffer`. |
 | `length` | `number` | Number of characters in the segment. |
