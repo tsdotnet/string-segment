@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import StringSegment, { type SplitOptions, split, splitToArray } from '../src/StringSegment';
+import StringSegment, { type SplitOptions, split, splitToArray } from '../src/StringSegment.js';
 
 const HELLO = 'Hello, World!';
 

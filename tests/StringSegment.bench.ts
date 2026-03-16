@@ -25,7 +25,7 @@
  */
 
 import { bench, describe } from 'vitest';
-import StringSegment from '../src/StringSegment';
+import StringSegment from '../src/StringSegment.js';
 
 const COMMA = ','.charCodeAt(0);
 const CRLF  = '\r\n';
