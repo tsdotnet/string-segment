@@ -1,4 +1,4 @@
-<a href="https://tsdotnet.github.io/string-segment/"><img src="https://cdn.jsdelivr.net/gh/tsdotnet/string-segment@master/assets/banner.svg" alt="@tsdotnet/string-segment: A slice, not a copy. Views over strings, like .NET’s."></a>
+<a name="banner"><img src="https://cdn.jsdelivr.net/gh/tsdotnet/string-segment@master/assets/banner.svg" alt="@tsdotnet/string-segment: A slice, not a copy. Views over strings, like .NET’s."></a>
 
 [![npm version](https://img.shields.io/npm/v/@tsdotnet/string-segment.svg?style=flat-square)](https://www.npmjs.com/package/@tsdotnet/string-segment)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://github.com/tsdotnet/string-segment/blob/master/LICENSE)
