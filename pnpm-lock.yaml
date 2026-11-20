@@ -33,11 +33,11 @@ importers:
   .:
     dependencies:
       '@tsdotnet/char':
-        specifier: ^1.3.0
-        version: 1.3.0
+        specifier: ^1.3.1
+        version: 1.3.1
       '@tsdotnet/exceptions':
-        specifier: ^1.3.0
-        version: 1.3.0
+        specifier: ^1.3.1
+        version: 1.3.1
       tslib:
         specifier: ^2.9.1
         version: 2.9.1
@@ -691,11 +691,11 @@ packages:
     resolution: {integrity: sha512-tlqY9xq5ukxTUZBmoOp+m61cqwQD5pHJtFY3Mn8CA8ps6yghLH/Hw8UPdqg4OLmFW3IFlcXnQNmo/dh8HzXYIQ==}
     engines: {node: '>=18'}
 
-  '@tsdotnet/char@1.3.0':
-    resolution: {integrity: sha512-kDh6g7Jrk027V8yZp2yxDGwW3KwWZ1vTAfLglK2sdDrLPDHMdBGqYCayoUJPs/iJ/PwRKFD7xqLfuPEevGhL/g==}
+  '@tsdotnet/char@1.3.1':
+    resolution: {integrity: sha512-Uy/IkPcyd+q93GG664vz1kmaGAlGmuKBLR+P6zUh3+Ec1ASLFySrGF2LTAgfjdHg2XGHFvN7kaUIJSfu6T1lQg==}
 
-  '@tsdotnet/exceptions@1.3.0':
-    resolution: {integrity: sha512-hL2tCtdlPaEZO/pZ/57DIHMt80Iex3s7ooyH1br/zvGFMB6ms0XzMnBPhzVvgjZjEgGtbtRAsyG6VWjePpY+0w==}
+  '@tsdotnet/exceptions@1.3.1':
+    resolution: {integrity: sha512-ZvG5sgVoY67QzYIMSu56dvY3idS8Rx02Ju6XtnCfOWyWWtbyeoHjgTWECbzgkYtm/7aP8Y2mRtMoHEUECNldQw==}
 
   '@tybys/wasm-util@0.10.5':
     resolution: {integrity: sha512-dOGOPxlaNV+G046mZzN+9C0dAcQZeSKcXiVaM0TYy/LM4ttTmgSBDxYfovcYI8Em3+eAbiAYpvWLOv8+ZVRJKA==}
@@ -2111,11 +2111,11 @@ snapshots:
 
   '@sindresorhus/merge-streams@4.0.0': {}
 
-  '@tsdotnet/char@1.3.0':
+  '@tsdotnet/char@1.3.1':
     dependencies:
       tslib: 2.9.1
 
-  '@tsdotnet/exceptions@1.3.0':
+  '@tsdotnet/exceptions@1.3.1':
     dependencies:
       tslib: 2.9.1
 
