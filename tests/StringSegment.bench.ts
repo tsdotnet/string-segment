@@ -24,7 +24,7 @@
  *     StringSegment: each .subsegment() just adjusts two integers.
  */
 
-import { bench, describe } from 'vitest';
+import { describe, it } from 'vitest';
 import StringSegment from '../src/StringSegment.js';
 
 const COMMA = ','.charCodeAt(0);
@@ -72,23 +72,26 @@ const COLON_CODE   = ':'.charCodeAt(0);
 // ---------------------------------------------------------------------------
 
 describe('Sparse CSV access (20 cols, read 2)', () => {
-	bench('native  — split all, index into array', () => {
-		const parts = CSV_ROW_20.split(',');
-		// Force reads to prevent dead-code elimination
-		const a = parts[0]!.trim();
-		const b = parts[2]!.trim();
-		if(a === b) throw new Error('unexpected');
-	});
+	it('native vs segment', async ({ bench }) => {
+		const b1 = bench('native  — split all, index into array', () => {
+			const parts = CSV_ROW_20.split(',');
+			// Force reads to prevent dead-code elimination
+			const a = parts[0]!.trim();
+			const b = parts[2]!.trim();
+			if(a === b) throw new Error('unexpected');
+		});
 
-	bench('segment — lazy split, materialize only cols 0 and 2', () => {
-		const seg = StringSegment.from(CSV_ROW_20);
-		let a = '', b = '', i = 0;
-		for(const part of seg.split(COMMA)) {
-			if(i === 0) a = part.trim().value;
-			else if(i === 2) { b = part.trim().value; break; }
-			i++;
-		}
-		if(a === b) throw new Error('unexpected');
+		const b2 = bench('segment — lazy split, materialize only cols 0 and 2', () => {
+			const seg = StringSegment.from(CSV_ROW_20);
+			let a = '', b = '', i = 0;
+			for(const part of seg.split(COMMA)) {
+				if(i === 0) a = part.trim().value;
+				else if(i === 2) { b = part.trim().value; break; }
+				i++;
+			}
+			if(a === b) throw new Error('unexpected');
+		});
+		await bench.compare(b1, b2);
 	});
 });
 
@@ -97,22 +100,25 @@ describe('Sparse CSV access (20 cols, read 2)', () => {
 // ---------------------------------------------------------------------------
 
 describe('Sparse CSV access (100 cols, read 2)', () => {
-	bench('native  — split all, index into array', () => {
-		const parts = CSV_ROW_100.split(',');
-		const a = parts[0]!.trim();
-		const b = parts[4]!.trim();
-		if(a === b) throw new Error('unexpected');
-	});
+	it('native vs segment', async ({ bench }) => {
+		const b1 = bench('native  — split all, index into array', () => {
+			const parts = CSV_ROW_100.split(',');
+			const a = parts[0]!.trim();
+			const b = parts[4]!.trim();
+			if(a === b) throw new Error('unexpected');
+		});
 
-	bench('segment — lazy split, materialize only cols 0 and 4', () => {
-		const seg = StringSegment.from(CSV_ROW_100);
-		let a = '', b = '', i = 0;
-		for(const part of seg.split(COMMA)) {
-			if(i === 0) a = part.trim().value;
-			else if(i === 4) { b = part.trim().value; break; }
-			i++;
-		}
-		if(a === b) throw new Error('unexpected');
+		const b2 = bench('segment — lazy split, materialize only cols 0 and 4', () => {
+			const seg = StringSegment.from(CSV_ROW_100);
+			let a = '', b = '', i = 0;
+			for(const part of seg.split(COMMA)) {
+				if(i === 0) a = part.trim().value;
+				else if(i === 4) { b = part.trim().value; break; }
+				i++;
+			}
+			if(a === b) throw new Error('unexpected');
+		});
+		await bench.compare(b1, b2);
 	});
 });
 
@@ -121,36 +127,39 @@ describe('Sparse CSV access (100 cols, read 2)', () => {
 // ---------------------------------------------------------------------------
 
 describe('HTTP header lookup (20 headers, find 1)', () => {
-	const TARGET = 'Content-Length';
+	it('native vs segment', async ({ bench }) => {
+		const TARGET = 'Content-Length';
 
-	bench('native  — split lines, split colon, trim, compare', () => {
-		let found = '';
-		for(const line of HEADERS_LINES_20) {
-			const colon = line.indexOf(':');
-			if(colon === -1) continue;
-			const key = line.substring(0, colon).trim();
-			if(key === TARGET) {
-				found = line.substring(colon + 1).trim();
-				break;
+		const b1 = bench('native  — split lines, split colon, trim, compare', () => {
+			let found = '';
+			for(const line of HEADERS_LINES_20) {
+				const colon = line.indexOf(':');
+				if(colon === -1) continue;
+				const key = line.substring(0, colon).trim();
+				if(key === TARGET) {
+					found = line.substring(colon + 1).trim();
+					break;
+				}
 			}
-		}
-		if(!found) throw new Error('not found');
-	});
+			if(!found) throw new Error('not found');
+		});
 
-	bench('segment — subsegment, trim, equals without materializing key', () => {
-		let found = '';
-		for(const line of HEADERS_LINES_20) {
-			const seg   = StringSegment.from(line);
-			const colon = seg.indexOf(COLON_CODE);
-			if(colon === -1) continue;
-			const key   = seg.subsegment(0, colon).trim();
-			// equals() compares on the buffer — no .substring() allocation
-			if(key.equals(TARGET)) {
-				found = seg.subsegment(colon + 1).trim().value;
-				break;
+		const b2 = bench('segment — subsegment, trim, equals without materializing key', () => {
+			let found = '';
+			for(const line of HEADERS_LINES_20) {
+				const seg   = StringSegment.from(line);
+				const colon = seg.indexOf(COLON_CODE);
+				if(colon === -1) continue;
+				const key   = seg.subsegment(0, colon).trim();
+				// equals() compares on the buffer — no .substring() allocation
+				if(key.equals(TARGET)) {
+					found = seg.subsegment(colon + 1).trim().value;
+					break;
+				}
 			}
-		}
-		if(!found) throw new Error('not found');
+			if(!found) throw new Error('not found');
+		});
+		await bench.compare(b1, b2);
 	});
 });
 
@@ -159,35 +168,38 @@ describe('HTTP header lookup (20 headers, find 1)', () => {
 // ---------------------------------------------------------------------------
 
 describe('HTTP header lookup (80 headers, find 1)', () => {
-	const TARGET = 'Content-Length';
+	it('native vs segment', async ({ bench }) => {
+		const TARGET = 'Content-Length';
 
-	bench('native  — split lines, split colon, trim, compare', () => {
-		let found = '';
-		for(const line of HEADERS_LINES_80) {
-			const colon = line.indexOf(':');
-			if(colon === -1) continue;
-			const key = line.substring(0, colon).trim();
-			if(key === TARGET) {
-				found = line.substring(colon + 1).trim();
-				break;
+		const b1 = bench('native  — split lines, split colon, trim, compare', () => {
+			let found = '';
+			for(const line of HEADERS_LINES_80) {
+				const colon = line.indexOf(':');
+				if(colon === -1) continue;
+				const key = line.substring(0, colon).trim();
+				if(key === TARGET) {
+					found = line.substring(colon + 1).trim();
+					break;
+				}
 			}
-		}
-		if(!found) throw new Error('not found');
-	});
+			if(!found) throw new Error('not found');
+		});
 
-	bench('segment — subsegment, trim, equals without materializing key', () => {
-		let found = '';
-		for(const line of HEADERS_LINES_80) {
-			const seg   = StringSegment.from(line);
-			const colon = seg.indexOf(COLON_CODE);
-			if(colon === -1) continue;
-			const key   = seg.subsegment(0, colon).trim();
-			if(key.equals(TARGET)) {
-				found = seg.subsegment(colon + 1).trim().value;
-				break;
+		const b2 = bench('segment — subsegment, trim, equals without materializing key', () => {
+			let found = '';
+			for(const line of HEADERS_LINES_80) {
+				const seg   = StringSegment.from(line);
+				const colon = seg.indexOf(COLON_CODE);
+				if(colon === -1) continue;
+				const key   = seg.subsegment(0, colon).trim();
+				if(key.equals(TARGET)) {
+					found = seg.subsegment(colon + 1).trim().value;
+					break;
+				}
 			}
-		}
-		if(!found) throw new Error('not found');
+			if(!found) throw new Error('not found');
+		});
+		await bench.compare(b1, b2);
 	});
 });
 
@@ -196,24 +208,27 @@ describe('HTTP header lookup (80 headers, find 1)', () => {
 // ---------------------------------------------------------------------------
 
 describe('Chained subsegment depth-4 (no allocation until .value)', () => {
-	// The target substring at known offsets in DEEP_STRING
-	// 'AAAA_BBBB_CCCC_DDDD_target_EEEE_FFFF'
-	//  0123456789...              ^offset 20, length 6
+	it('native vs segment', async ({ bench }) => {
+		// The target substring at known offsets in DEEP_STRING
+		// 'AAAA_BBBB_CCCC_DDDD_target_EEEE_FFFF'
+		//  0123456789...              ^offset 20, length 6
 
-	bench('native  — 4x string.substring', () => {
-		const s1 = DEEP_STRING.substring(5);        // 'BBBB_CCCC_DDDD_target_EEEE_FFFF'
-		const s2 = s1.substring(5);                 // 'CCCC_DDDD_target_EEEE_FFFF'
-		const s3 = s2.substring(5);                 // 'DDDD_target_EEEE_FFFF'
-		const s4 = s3.substring(5, 11);             // 'target'
-		if(s4 !== 'target') throw new Error('mismatch');
-	});
+		const b1 = bench('native  — 4x string.substring', () => {
+			const s1 = DEEP_STRING.substring(5);        // 'BBBB_CCCC_DDDD_target_EEEE_FFFF'
+			const s2 = s1.substring(5);                 // 'CCCC_DDDD_target_EEEE_FFFF'
+			const s3 = s2.substring(5);                 // 'DDDD_target_EEEE_FFFF'
+			const s4 = s3.substring(5, 11);             // 'target'
+			if(s4 !== 'target') throw new Error('mismatch');
+		});
 
-	bench('segment — 4x subsegment, one .value at the end', () => {
-		const s1 = StringSegment.from(DEEP_STRING).subsegment(5);   // no alloc
-		const s2 = s1.subsegment(5);                               // no alloc
-		const s3 = s2.subsegment(5);                               // no alloc
-		const s4 = s3.subsegment(5, 6);                            // no alloc
-		if(s4.value !== 'target') throw new Error('mismatch');     // alloc here
+		const b2 = bench('segment — 4x subsegment, one .value at the end', () => {
+			const s1 = StringSegment.from(DEEP_STRING).subsegment(5);   // no alloc
+			const s2 = s1.subsegment(5);                               // no alloc
+			const s3 = s2.subsegment(5);                               // no alloc
+			const s4 = s3.subsegment(5, 6);                            // no alloc
+			if(s4.value !== 'target') throw new Error('mismatch');     // alloc here
+		});
+		await bench.compare(b1, b2);
 	});
 });
 
@@ -223,24 +238,27 @@ describe('Chained subsegment depth-4 (no allocation until .value)', () => {
 // ---------------------------------------------------------------------------
 
 describe('Trim + compare (high-frequency token check)', () => {
-	const PADDED_TOKENS = Array.from({ length: 1000 }, (_, i) =>
-		`  ${'x'.repeat(i % 20 + 1)}  `
-	);
-	const TARGET = 'xxxxx'; // 5 x's — matches index 4
+	it('native vs segment', async ({ bench }) => {
+		const PADDED_TOKENS = Array.from({ length: 1000 }, (_, i) =>
+			`  ${'x'.repeat(i % 20 + 1)}  `
+		);
+		const TARGET = 'xxxxx'; // 5 x's — matches index 4
 
-	bench('native  — trim allocates string, then compare', () => {
-		let found = false;
-		for(const t of PADDED_TOKENS) {
-			if(t.trim() === TARGET) { found = true; break; }
-		}
-		if(!found) throw new Error('not found');
-	});
+		const b1 = bench('native  — trim allocates string, then compare', () => {
+			let found = false;
+			for(const t of PADDED_TOKENS) {
+				if(t.trim() === TARGET) { found = true; break; }
+			}
+			if(!found) throw new Error('not found');
+		});
 
-	bench('segment — trim adjusts offsets, equals checks buffer directly', () => {
-		let found = false;
-		for(const t of PADDED_TOKENS) {
-			if(StringSegment.from(t).trim().equals(TARGET)) { found = true; break; }
-		}
-		if(!found) throw new Error('not found');
+		const b2 = bench('segment — trim adjusts offsets, equals checks buffer directly', () => {
+			let found = false;
+			for(const t of PADDED_TOKENS) {
+				if(StringSegment.from(t).trim().equals(TARGET)) { found = true; break; }
+			}
+			if(!found) throw new Error('not found');
+		});
+		await bench.compare(b1, b2);
 	});
 });
